@@ -1,10 +1,8 @@
 #include <iostream>
-
 #include "Process.h"
 
-HWND get_hwnd(LPCSTR window_name) {
-	HWND hwnd = FindWindowA(NULL, window_name);
-	return hwnd;
+HWND get_hwnd(std::string window_name) {
+	return FindWindowA(NULL, window_name.c_str());
 }
 
 DWORD get_pid(HWND hwnd) {
@@ -28,32 +26,28 @@ HANDLE get_process_handle(DWORD pid) {
 	return process;
 }
 
-DWORD64 get_base_address(HANDLE process_handle)
+unsigned long long get_base_address(DWORD pid, std::string process_name)
 {
-	// str8 ripped cuz nothing else works ;(
-	DWORD newBase;
+	unsigned long long newBase = 0;
+	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid);
 
-	// get the address of kernel32.dll
-	HMODULE k32 = GetModuleHandle(L"kernel32.dll");
+	MODULEENTRY32 ModuleEntry32;
+	ModuleEntry32.dwSize = sizeof(MODULEENTRY32);
 
-	// get the address of GetModuleHandle()
-	LPVOID funcAdr = GetProcAddress(k32, "GetModuleHandleA");
-	if (!funcAdr)
-		funcAdr = GetProcAddress(k32, "GetModuleHandleW");
+	if (hSnapshot == INVALID_HANDLE_VALUE || !(Module32First(hSnapshot, &ModuleEntry32))) {
+		CloseHandle(hSnapshot);
+		return newBase;
+	}
 
-	// create the thread
-	HANDLE thread = CreateRemoteThread(
-		process_handle, NULL, NULL, (LPTHREAD_START_ROUTINE)funcAdr, NULL, NULL, NULL
-	);
+	std::wstring process_name_wide = std::wstring(process_name.begin(), process_name.end());
+	do {
+		if (!_tccmp(ModuleEntry32.szModule, process_name_wide.c_str()))
+		{
+			newBase = (unsigned long long) ModuleEntry32.modBaseAddr;
+			break;
+		}
+	} while (Module32Next(hSnapshot, &ModuleEntry32));
 
-	// let the thread finish
-	WaitForSingleObject(thread, INFINITE);
-
-	// get the exit code
-	GetExitCodeThread(thread, &newBase);
-
-	// clean up the thread handle
-	CloseHandle(thread);
-
+	CloseHandle(hSnapshot);
 	return newBase;
 }

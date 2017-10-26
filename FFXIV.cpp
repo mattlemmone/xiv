@@ -27,7 +27,7 @@ void FFXIV::set_hwnd(HWND hwnd) {
 #pragma endregion
 
 #pragma region Accessors
-DWORD64 const& FFXIV::get_base_address() {
+unsigned long long const& FFXIV::get_base_address() {
 	return this->base_address;
 }
 

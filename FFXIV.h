@@ -16,7 +16,7 @@ public:
 	void set_hwnd(HWND hwnd);
 
 	// Getters
-	DWORD64 const& get_base_address();
+	unsigned long long const& get_base_address();
 	HANDLE const& get_handle();
 	DWORD const& get_pid();
 	HWND const& get_hwnd();
@@ -31,7 +31,7 @@ private:
 	static FFXIV *p_instance;
 
 	// Process specific
-	DWORD64 base_address;
+	unsigned long long base_address;
 	HANDLE handle;
 	DWORD pid;
 	HWND hwnd;
