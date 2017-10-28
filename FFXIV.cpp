@@ -9,8 +9,8 @@ FFXIV* FFXIV::instance() {
 }
 
 #pragma region Mutators
-void FFXIV::set_base_address(DWORD64 base_address) {
-	this->base_address = base_address;
+void FFXIV::set_module(MODULEENTRY32 module) {
+	this->module = module;
 }
 
 void FFXIV::set_handle(HANDLE handle) {
@@ -24,11 +24,12 @@ void FFXIV::set_pid(DWORD pid) {
 void FFXIV::set_hwnd(HWND hwnd) {
 	this->hwnd = hwnd;
 }
+
 #pragma endregion
 
 #pragma region Accessors
-unsigned long long const& FFXIV::get_base_address() {
-	return this->base_address;
+BYTE* const& FFXIV::get_base_address() {
+	return this->module.modBaseAddr;
 }
 
 HANDLE const& FFXIV::get_handle() {
@@ -41,5 +42,9 @@ DWORD const& FFXIV::get_pid() {
 
 HWND const& FFXIV::get_hwnd() {
 	return this->hwnd;
+}
+
+MODULEENTRY32 const& FFXIV::get_module() {
+	return this->module;
 }
 #pragma endregion

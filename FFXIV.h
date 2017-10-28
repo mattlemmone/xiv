@@ -1,5 +1,7 @@
 #include <string>
 #include <Windows.h>
+#include <tlhelp32.h>
+#include <Psapi.h>
 
 #pragma once
 class FFXIV {
@@ -10,13 +12,14 @@ public:
 	static FFXIV *instance();
 
 	// Setters
-	void set_base_address(DWORD64 base_address);
 	void set_handle(HANDLE handle);
 	void set_pid(DWORD pid);
 	void set_hwnd(HWND hwnd);
+	void set_module(MODULEENTRY32 module);
 
 	// Getters
-	unsigned long long const& get_base_address();
+	BYTE* const& get_base_address();
+	MODULEENTRY32 const& get_module();
 	HANDLE const& get_handle();
 	DWORD const& get_pid();
 	HWND const& get_hwnd();
@@ -35,4 +38,5 @@ private:
 	HANDLE handle;
 	DWORD pid;
 	HWND hwnd;
+	MODULEENTRY32 module;
 };

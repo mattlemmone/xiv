@@ -14,7 +14,7 @@ DWORD get_pid(HWND hwnd) {
 HANDLE get_process_handle(DWORD pid) {
 	HANDLE process = OpenProcess(
 		// memory manip, read, write flags
-		PROCESS_VM_READ | PROCESS_VM_WRITE,
+		PROCESS_ALL_ACCESS,
 		FALSE, // inherit process handle
 		pid
 	);
@@ -26,28 +26,28 @@ HANDLE get_process_handle(DWORD pid) {
 	return process;
 }
 
-unsigned long long get_base_address(DWORD pid, std::string process_name)
+MODULEENTRY32 get_module(DWORD pid, std::string process_name)
 {
-	unsigned long long newBase = 0;
-	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid);
 
 	MODULEENTRY32 ModuleEntry32;
 	ModuleEntry32.dwSize = sizeof(MODULEENTRY32);
+	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, pid);
+
 
 	if (hSnapshot == INVALID_HANDLE_VALUE || !(Module32First(hSnapshot, &ModuleEntry32))) {
 		CloseHandle(hSnapshot);
-		return newBase;
+		return ModuleEntry32;
 	}
 
-	std::wstring process_name_wide = std::wstring(process_name.begin(), process_name.end());
+
 	do {
-		if (!_tccmp(ModuleEntry32.szModule, process_name_wide.c_str()))
+		if (!_tccmp(ModuleEntry32.szModule, process_name.c_str()))
 		{
-			newBase = (unsigned long long) ModuleEntry32.modBaseAddr;
+			return ModuleEntry32;
 			break;
 		}
 	} while (Module32Next(hSnapshot, &ModuleEntry32));
 
 	CloseHandle(hSnapshot);
-	return newBase;
+	return ModuleEntry32;
 }
