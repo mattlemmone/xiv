@@ -1,13 +1,5 @@
 #include "FFXIV.h"
 
-FFXIV *FFXIV::p_instance = NULL;
-
-FFXIV* FFXIV::instance() {
-	if (!p_instance)
-		p_instance = new FFXIV;
-	return p_instance;
-}
-
 #pragma region Mutators
 void FFXIV::set_module(MODULEENTRY32 module) {
 	this->module = module;

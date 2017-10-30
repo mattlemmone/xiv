@@ -1,16 +1,11 @@
+#pragma once
 #include <string>
 #include <Windows.h>
 #include <tlhelp32.h>
 #include <Psapi.h>
-
-#pragma once
-class FFXIV {
-
+#include "Singleton.h"
+class FFXIV : public Singleton<FFXIV>{
 public:
-
-	// Get singleton
-	static FFXIV *instance();
-
 	// Setters
 	void set_handle(HANDLE handle);
 	void set_pid(DWORD pid);
@@ -29,10 +24,6 @@ public:
 	const std::string window_name = "FINAL FANTASY XIV";
 
 private:
-
-	// Singleton
-	static FFXIV *p_instance;
-
 	// Process specific
 	unsigned long long base_address;
 	HANDLE handle;
