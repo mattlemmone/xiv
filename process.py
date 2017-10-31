@@ -43,23 +43,28 @@ class MODULEENTRY32(Structure):
 
 
 def get_hwnd(window_name):
-    return win32gui.FindWindow(None, window_name)
+    hwnd = win32gui.FindWindow(None, window_name)
+    assert(hwnd)
+    return hwnd
 
 
 def get_pid(process_name):
-    return next(
+    pid = next(
         item for item in psutil.process_iter()
         if item.name() == process_name
     ).pid
+    assert(pid)
+    return pid
 
 
 def get_handle(pid):
-    return win32api.OpenProcess(
+    handle = win32api.OpenProcess(
         win32con.PROCESS_ALL_ACCESS,
         False,
         pid
     )
-
+    assert(handle)
+    return handle
 
 def get_base_address(pid):
     me32 = MODULEENTRY32()

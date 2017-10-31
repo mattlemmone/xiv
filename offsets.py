@@ -1,6 +1,6 @@
 from munch import Munch
 
-player_offsets = Munch(
+player_base_offsets = Munch(
     # Misc
     name=0x30,
     distance=0x8D,
@@ -12,7 +12,7 @@ player_offsets = Munch(
     heading=0xB0,
 )
 
-player_parameters = Munch(
+player_parameter_offsets = Munch(
     current_health=0x00,
     max_health=0x04,
     current_mana=0x08,
