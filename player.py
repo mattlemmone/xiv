@@ -3,10 +3,12 @@ from ctypes.wintypes import c_uint
 from ctypes.wintypes import c_ulonglong
 from munch import Munch
 
+from memory import MemoryWatch
 from memory import RegistryEntry
 from offsets import entity_base_offsets
 from offsets import player_parameter_offsets
 from pointers import base_pointers
+from pointers import single_level_pointers
 from singleton import Singleton
 
 from entity import Entity
@@ -16,8 +18,26 @@ class Player(Entity):
     __metaclass__ = Singleton
 
     def __init__(self):
-        self.target = None
-        super(Player, self).__init__()
+        self._target_address = None
+        self.target_entity = None
+        super(Player, self).__init__(address=None)
+
+    @property
+    def target_address(self):
+        return self._target_address
+
+    @target_address.setter
+    def target_address(self, new_target_address):
+        # Target unchanged
+        if new_target_address == self._target_address:
+            return
+
+        # Target changed
+        if self.target_entity:
+            MemoryWatch.unregister_by_ref(self)
+        if new_target_address:
+            self.target_entity = Entity(new_target_address)
+        self._target_address = new_target_address
 
     def _update_registry_map(self):
         # Must be called here as pointers are likely already resolved
@@ -27,39 +47,39 @@ class Player(Entity):
         self.REGISTRY_MAP = Munch(
             # Parameters
             current_hp=self._build_registry_entry(
-                'parameters', 'current_hp', 'parameters current_hp'
+                'player params', 'current_hp', 'parameters current_hp'
             ),
             max_hp=self._build_registry_entry(
-                'parameters', 'max_hp', 'parameters max_hp'
+                'player params', 'max_hp', 'parameters max_hp'
             ),
             current_mp=self._build_registry_entry(
-                'parameters', 'current_mp', 'parameters current_mp'
+                'player params', 'current_mp', 'parameters current_mp'
             ),
             max_mp=self._build_registry_entry(
-                'parameters', 'max_mp', 'parameters max_mp'
+                'player params', 'max_mp', 'parameters max_mp'
             ),
-            tp=self._build_registry_entry('parameters', 'tp', 'parameters tp'),
+            tp=self._build_registry_entry('player params', 'tp', 'parameters tp'),
 
             # Player Base
             name=self._build_registry_entry(
-                'base', 'name', data_type=self.NAME_BUFFER
+                'player base', 'name', data_type=self.NAME_BUFFER
             ),
-            x=self._build_registry_entry('base', 'x', 'position x', c_float()),
-            y=self._build_registry_entry('base', 'y', 'position y', c_float()),
-            z=self._build_registry_entry('base', 'z', 'position z', c_float()),
+            x=self._build_registry_entry('player base', 'x', 'position x', c_float()),
+            y=self._build_registry_entry('player base', 'y', 'position y', c_float()),
+            z=self._build_registry_entry('player base', 'z', 'position z', c_float()),
 
             # Misc
-            # target=self._build_registry_entry(
-            #     'target', None, 'target', c_ulonglong()
-            # )
+            target_address=self._build_registry_entry(
+                'player target address', None, 'target_address', c_ulonglong()
+            )
         )
 
     def _build_registry_entry(
-        self, offset_group, offset_name,
+        self, description, offset_name,
         attribute_path_str=None, data_type=c_uint()
     ):
         """
-        offset_group -> determines which address and offsets are used.
+        description -> determines which address and offsets are used.
         offset_name -> must match property name in corresponding OFFSETS.
             If no offset, assume it's a pointer.
         attribute_path_str -> how the value is to be assigned to the class.
@@ -69,23 +89,22 @@ class Player(Entity):
         if not attribute_path_str:
             attribute_path_str = offset_name
 
-        if offset_group == 'parameters':
-            ADDRESS = base_pointers.player_parameters.address
-            OFFSETS = player_parameter_offsets
-        elif offset_group == 'base':
-            ADDRESS = base_pointers.entity_base.address
-            OFFSETS = entity_base_offsets
-
-        # Assume we are reading a pointer
+        # Assume this is a pointer
         if not offset_name:
-            pass
+            offset = 0
 
+        if 'params' in description:
+            pointer = base_pointers.player_parameters
+            offset = player_parameter_offsets[offset_name]
+        elif 'base' in description:
+            pointer = base_pointers.entity_base
+            offset = entity_base_offsets[offset_name]
+        elif 'target address' in description:
+            pointer = single_level_pointers.player_target
+        else:
+            print 'error on %s %s' % (description, attribute_path_str)
         return RegistryEntry(
-            reference=self, attribute_path=attribute_path_str.split(),
-            address=ADDRESS, offset=OFFSETS[offset_name],
-            data_type=data_type
+            reference=self, description=description, attribute_path=attribute_path_str.split(),
+            address=pointer.address, offset=offset,
+            data_type=data_type, is_lvl1_ptr=bool(not offset_name)
         )
-
-
-
-

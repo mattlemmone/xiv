@@ -1,14 +1,14 @@
 from memory import MemoryWatch
 from player import Player
-import ffxiv
+import client
 import process
 
 
-def initialize_ffxiv_data():
-    ffxiv.hwnd = process.get_hwnd(window_name=ffxiv.window_name)
-    ffxiv.pid = process.get_pid(process_name=ffxiv.process_name)
-    ffxiv.py_handle = process.get_handle(pid=ffxiv.pid)
-    ffxiv.base_address = process.get_base_address(pid=ffxiv.pid)
+def initialize_client_data():
+    client.hwnd = process.get_hwnd(window_name=client.window_name)
+    client.pid = process.get_pid(process_name=client.process_name)
+    client.py_handle = process.get_handle(pid=client.pid)
+    client.base_address = process.get_base_address(pid=client.pid)
 
 
 def create_registry_singletons():
@@ -17,9 +17,9 @@ def create_registry_singletons():
 
 
 def main():
-    initialize_ffxiv_data()
+    initialize_client_data()
 
-    mem_watch = MemoryWatch(application=ffxiv)
+    mem_watch = MemoryWatch(client=client)
     mem_watch.find_base_pointers()
 
     # Must create singletons after pointers are found
