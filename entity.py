@@ -5,17 +5,44 @@ from munch import Munch
 
 from memory import RegistryEntry
 from offsets import entity_base_offsets
-from offsets import player_parameter_offsets
 from pointers import base_pointers
-from singleton import Singleton
 from structs import Parameters
 from structs import Position
 
-from entity import Entity
+MAX_NAME_LENGTH = 32
 
 
-class Player(Entity):
-    __metaclass__ = Singleton
+class Entity(object):
+
+    def __init__(self):
+
+        self.REGISTRY_MAP = Munch()
+        self.NAME_BUFFER = create_string_buffer('_' * MAX_NAME_LENGTH)
+
+        self.name = None
+        self.target_distance = None
+        self.parameters = Parameters
+        self.position = Position
+
+        self._register()
+
+    def _register(self):
+        self._update_registry_map()
+        for attribute in self.REGISTRY_MAP:
+            self._create_registry_entry(attribute)
+
+    def _create_registry_entry(self, attribute):
+        """
+        Forwards data from registry map to create and register a new RegistryEntry
+        """
+        mapping = self.REGISTRY_MAP.get(attribute)
+        assert(mapping.address)
+
+        RegistryEntry(
+            reference=self, attribute_path=mapping.attribute_path,
+            address=mapping.address, offset=mapping.offset,
+            data_type=mapping.type
+        ).register()
 
     def _update_registry_map(self):
         # Must be called here as pointers are likely already resolved
@@ -33,9 +60,8 @@ class Player(Entity):
             max_mana=self._build_registry_dict(
                 'parameters', 'max_mana', 'parameters max_mana'
             ),
-            tp=self._build_registry_dict('parameters', 'tp', 'parameters tp'),
 
-            # Player Base
+            # Base
             name=self._build_registry_dict(
                 'base', 'name', data_type=self.NAME_BUFFER
             ),
@@ -55,20 +81,16 @@ class Player(Entity):
             e.g. Player.position.x: 'position x'
         data_type -> specified wintype necessary for reading correct amount of bytes
         """
+
         if not attribute_path_str:
             attribute_path_str = offset_name
 
-        if offset_group == 'parameters':
-            ADDRESS = base_pointers.player_parameters.address
-            OFFSETS = player_parameter_offsets
-        else:
-            ADDRESS = base_pointers.entity_base.address
-            OFFSETS = entity_base_offsets
+        ADDRESS = base_pointers.entity_base.address
+        OFFSETS = entity_base_offsets
 
         return Munch(
             address=ADDRESS, offset=OFFSETS[offset_name],
             type=data_type, attribute_path=attribute_path_str.split()
         )
-
 
 

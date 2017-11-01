@@ -1,7 +1,7 @@
-import process
-import ffxiv
 from memory import MemoryWatch
 from player import Player
+import ffxiv
+import process
 
 
 def initialize_ffxiv_data():
@@ -20,7 +20,7 @@ def main():
     initialize_ffxiv_data()
 
     mem_watch = MemoryWatch(application=ffxiv)
-    mem_watch.find_all_pointers()
+    mem_watch.find_base_pointers()
 
     # Must create singletons after pointers are found
     create_registry_singletons()

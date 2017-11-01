@@ -1,11 +1,12 @@
-import ctypes
-from ctypes.wintypes import LPCVOID
-from ctypes.wintypes import LPVOID
-from ctypes.wintypes import HANDLE
-from ctypes.wintypes import POINTER
 from ctypes.wintypes import BOOL
 from ctypes.wintypes import DWORD
-from pointers import all_pointers
+from ctypes.wintypes import HANDLE
+from ctypes.wintypes import LPCVOID
+from ctypes.wintypes import LPVOID
+from ctypes.wintypes import POINTER
+import ctypes
+
+from pointers import base_pointers
 from singleton import Singleton
 
 
@@ -44,13 +45,13 @@ class MemoryWatch(object):
     def __init__(self, application):
         self.application = application
 
-    def find_all_pointers(self):
+    def find_base_pointers(self):
         """
         Updates/resolves all pointer addresses so they can be referenced for
         immediate memory reads
         """
         print "Finding pointers..."
-        for name, pointer in all_pointers.items():
+        for name, pointer in base_pointers.items():
             print "Resolving %s pointer @ %s..." % (name, pointer.offsets)
             pointer.address = read_address_pointers(
                 self.application.py_handle.handle,
@@ -82,7 +83,7 @@ class MemoryWatch(object):
                 _reference_update(
                     entry.reference.__dict__, entry.attribute_path, new_value
                 )
-                print 'Updated %s --> %s' % (entry.attribute_path, str(new_value))
+                print 'Updated {:32s} --> {:15s}'.format(entry.attribute_path, str(new_value))
 
             import time
             time.sleep(poll_rate)

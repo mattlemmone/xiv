@@ -1,18 +1,17 @@
 from ctypes import windll
-from ctypes.wintypes import DWORD
 from ctypes.wintypes import addressof
-from ctypes.wintypes import Structure
+from ctypes.wintypes import BYTE
+from ctypes.wintypes import c_char
+from ctypes.wintypes import DWORD
+from ctypes.wintypes import HMODULE
 from ctypes.wintypes import POINTER
 from ctypes.wintypes import pointer
-from ctypes.wintypes import BYTE
-from ctypes.wintypes import HMODULE
-from ctypes.wintypes import c_char
 from ctypes.wintypes import sizeof
-from ctypes import cast
+from ctypes.wintypes import Structure
 import psutil
-import win32gui
 import win32api
 import win32con
+import win32gui
 
 # Module specific
 STANDARD_RIGHTS_REQUIRED = 0x000F0000
