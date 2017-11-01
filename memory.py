@@ -1,3 +1,4 @@
+from collections import defaultdict
 from ctypes.wintypes import BOOL
 from ctypes.wintypes import DWORD
 from ctypes.wintypes import HANDLE
@@ -5,6 +6,7 @@ from ctypes.wintypes import LPCVOID
 from ctypes.wintypes import LPVOID
 from ctypes.wintypes import POINTER
 import ctypes
+
 
 import client
 from pointers import base_pointers
@@ -48,7 +50,7 @@ class RegistryEntry(object):
 
 class MemoryWatch(object):
     __metaclass__ = Singleton
-    _registry = []
+    _registry = defaultdict(list)
 
     def __init__(self, client):
         self.client = client
@@ -76,11 +78,12 @@ class MemoryWatch(object):
         print "%s: registering %s%r" % (
             cls.__name__, class_name, registry_entry.attribute_path
         )
-        cls._registry.append(registry_entry)
+        cls._registry[reference].append(registry_entry)
 
     @classmethod
     def unregister_by_ref(cls, reference):
-        cls._registry.remove(reference)
+        removed = cls._registry.pop(reference, None)
+        assert removed, 'Couldnt remove reference from registry!'
 
     def start(self, poll_rate=DEFAULT_POLL_RATE):
         """
@@ -89,21 +92,22 @@ class MemoryWatch(object):
         handle = self.client.py_handle.handle
         while True:
             print '-' * 40
-            for entry in self._registry:
-                new_value = read_address(handle, entry.address, entry.data_type)
-                _reference_update(
-                    entry.reference, entry.attribute_path, new_value
-                )
-                print 'Updated {:22s} {:29s} --> {:15s}'.format(
-                    entry.description, entry.attribute_path, str(new_value)
-                )
+            for reference, entry_dict in self._registry.items():
+                for entry in entry_dict:
+                    new_value = read_address(handle, entry.address, entry.data_type)
+                    _reference_update(
+                        entry.reference, entry.attribute_path, new_value
+                    )
+                    print 'Updated {:22s} {:29s} --> {:15s}'.format(
+                        entry.description, entry.attribute_path, str(new_value)
+                    )
 
             import time
             time.sleep(poll_rate)
 
 
 def _reference_update(reference, attribute_path, new_value):
-    # Very sneaky way of updating an instance reference via __dict__ and nested keys
+    # Update reference attributes
     attr = attribute_path[0]
     if len(attribute_path) > 1:
         cloned_path = list(attribute_path[1:])

@@ -17,10 +17,10 @@ entity_base_offsets = Munch(
     heading=0xB0,
 
     # Parameters without TP
-    current_hp=0x16A0,
-    max_hp=0x16A0 + 4,
-    current_mp=0x16A0 + 8,
-    max_mp=0x16A0 + 12,
+    current_hp=0x16A8,
+    max_hp=0x16A8 + 4,
+    current_mp=0x16A8 + 8,
+    max_mp=0x16A8 + 12,
 )
 
 player_parameter_offsets = Munch(

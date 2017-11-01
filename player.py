@@ -34,7 +34,7 @@ class Player(Entity):
 
         # Target changed
         if self.target_entity:
-            MemoryWatch.unregister_by_ref(self)
+            MemoryWatch.unregister_by_ref(self.target_entity)
         if new_target_address:
             self.target_entity = Entity(new_target_address)
         self._target_address = new_target_address
