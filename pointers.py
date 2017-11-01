@@ -17,6 +17,7 @@ base_pointers = Munch(
     player_parameters=MemoryPointer(
         [0x01807FB8, 0x30, 0x58, 0x18, 0x20]
     ),
+    player_target=MemoryPointer([0x1801A10])
 )
 #noticed enemies have an offset that represent their distance from me...
 # idea: search for address of player base in memory, find out what up

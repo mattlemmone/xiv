@@ -20,7 +20,6 @@ class Entity(object):
         self.NAME_BUFFER = create_string_buffer('_' * MAX_NAME_LENGTH)
 
         self.name = None
-        self.target_distance = None
         self.parameters = Parameters
         self.position = Position
 
@@ -35,41 +34,37 @@ class Entity(object):
         """
         Forwards data from registry map to create and register a new RegistryEntry
         """
-        mapping = self.REGISTRY_MAP.get(attribute)
-        assert(mapping.address)
+        registry_entry = self.REGISTRY_MAP.get(attribute)
+        assert(registry_entry.address)
 
-        RegistryEntry(
-            reference=self, attribute_path=mapping.attribute_path,
-            address=mapping.address, offset=mapping.offset,
-            data_type=mapping.type
-        ).register()
+        registry_entry.register()
 
     def _update_registry_map(self):
         # Must be called here as pointers are likely already resolved
         # For the entity, everything will be built on the base address.
         self.REGISTRY_MAP = Munch(
-            current_hp=self._build_registry_dict(
+            current_hp=self._build_registry_entry(
                 'base', 'current_hp', 'parameters current_hp'
             ),
-            max_hp=self._build_registry_dict(
+            max_hp=self._build_registry_entry(
                 'base', 'max_hp', 'parameters max_hp'
             ),
-            current_mp=self._build_registry_dict(
+            current_mp=self._build_registry_entry(
                 'base', 'current_mp', 'parameters current_mp'
             ),
-            max_mp=self._build_registry_dict(
+            max_mp=self._build_registry_entry(
                 'base', 'max_mp', 'parameters max_mp'
             ),
 
-            name=self._build_registry_dict(
+            name=self._build_registry_entry(
                 'base', 'name', data_type=self.NAME_BUFFER
             ),
-            x=self._build_registry_dict('base', 'x', 'position x', c_float()),
-            y=self._build_registry_dict('base', 'y', 'position y', c_float()),
-            z=self._build_registry_dict('base', 'z', 'position z', c_float()),
+            x=self._build_registry_entry('base', 'x', 'position x', c_float()),
+            y=self._build_registry_entry('base', 'y', 'position y', c_float()),
+            z=self._build_registry_entry('base', 'z', 'position z', c_float()),
         )
 
-    def _build_registry_dict(
+    def _build_registry_entry(
         self, offset_group, offset_name,
         attribute_path_str=None, data_type=c_uint()
     ):
@@ -87,9 +82,10 @@ class Entity(object):
         ADDRESS = base_pointers.entity_base.address
         OFFSETS = entity_base_offsets
 
-        return Munch(
+        return RegistryEntry(
+            reference=self, attribute_path=attribute_path_str.split(),
             address=ADDRESS, offset=OFFSETS[offset_name],
-            type=data_type, attribute_path=attribute_path_str.split()
+            data_type=data_type
         )
 
 
