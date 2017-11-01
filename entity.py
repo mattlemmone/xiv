@@ -46,22 +46,21 @@ class Entity(object):
 
     def _update_registry_map(self):
         # Must be called here as pointers are likely already resolved
+        # For the entity, everything will be built on the base address.
         self.REGISTRY_MAP = Munch(
-            # Parameters
-            current_health=self._build_registry_dict(
-                'parameters', 'current_health', 'parameters current_health'
+            current_hp=self._build_registry_dict(
+                'base', 'current_hp', 'parameters current_hp'
             ),
-            max_health=self._build_registry_dict(
-                'parameters', 'max_health', 'parameters max_health'
+            max_hp=self._build_registry_dict(
+                'base', 'max_hp', 'parameters max_hp'
             ),
-            current_mana=self._build_registry_dict(
-                'parameters', 'current_mana', 'parameters current_mana'
+            current_mp=self._build_registry_dict(
+                'base', 'current_mp', 'parameters current_mp'
             ),
-            max_mana=self._build_registry_dict(
-                'parameters', 'max_mana', 'parameters max_mana'
+            max_mp=self._build_registry_dict(
+                'base', 'max_mp', 'parameters max_mp'
             ),
 
-            # Base
             name=self._build_registry_dict(
                 'base', 'name', data_type=self.NAME_BUFFER
             ),

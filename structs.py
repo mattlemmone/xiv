@@ -1,10 +1,10 @@
 from munch import Munch
 
 Parameters = Munch(
-    current_health=None,
-    max_health=None,
-    current_mana=None,
-    max_mana=None,
+    current_hp=None,
+    max_hp=None,
+    current_mp=None,
+    max_mp=None,
     tp=None,
 )
 

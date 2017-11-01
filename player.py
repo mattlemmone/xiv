@@ -3,13 +3,10 @@ from ctypes.wintypes import c_float
 from ctypes.wintypes import c_uint
 from munch import Munch
 
-from memory import RegistryEntry
 from offsets import entity_base_offsets
 from offsets import player_parameter_offsets
 from pointers import base_pointers
 from singleton import Singleton
-from structs import Parameters
-from structs import Position
 
 from entity import Entity
 
@@ -19,19 +16,22 @@ class Player(Entity):
 
     def _update_registry_map(self):
         # Must be called here as pointers are likely already resolved
+        # For the player, everything will be built on multiple pointer addresses.
+        # Mostly on the base, but additional features will be added in, hence
+        # subclassing.
         self.REGISTRY_MAP = Munch(
             # Parameters
-            current_health=self._build_registry_dict(
-                'parameters', 'current_health', 'parameters current_health'
+            current_hp=self._build_registry_dict(
+                'parameters', 'current_hp', 'parameters current_hp'
             ),
-            max_health=self._build_registry_dict(
-                'parameters', 'max_health', 'parameters max_health'
+            max_hp=self._build_registry_dict(
+                'parameters', 'max_hp', 'parameters max_hp'
             ),
-            current_mana=self._build_registry_dict(
-                'parameters', 'current_mana', 'parameters current_mana'
+            current_mp=self._build_registry_dict(
+                'parameters', 'current_mp', 'parameters current_mp'
             ),
-            max_mana=self._build_registry_dict(
-                'parameters', 'max_mana', 'parameters max_mana'
+            max_mp=self._build_registry_dict(
+                'parameters', 'max_mp', 'parameters max_mp'
             ),
             tp=self._build_registry_dict('parameters', 'tp', 'parameters tp'),
 

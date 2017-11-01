@@ -17,16 +17,16 @@ entity_base_offsets = Munch(
     heading=0xB0,
 
     # Parameters without TP
-    current_health=0x16A0,
-    max_health=0x16A0 + 4,
-    current_mana=0x16A0 + 8,
-    max_mana=0x16A0 + 12,
+    current_hp=0x16A0,
+    max_hp=0x16A0 + 4,
+    current_mp=0x16A0 + 8,
+    max_mp=0x16A0 + 12,
 )
 
 player_parameter_offsets = Munch(
-    current_health=0x00,
-    max_health=0x00 + 4,
-    current_mana=0x00 + 8,
-    max_mana=0x00 + 12,
+    current_hp=0x00,
+    max_hp=0x00 + 4,
+    current_mp=0x00 + 8,
+    max_mp=0x00 + 12,
     tp=0x00 + 16,
 )
