@@ -69,7 +69,7 @@ class MemoryWatch(Thread):
         """
         logger.debug("Finding pointers...")
         for name, pointer in base_pointers.items():
-            logger.debug("Resolving %s pointer @ %s..." % (name, pointer.offsets))
+            logger.debug("Resolving %s pointer @ %s...", name, pointer.offsets)
             pointer.address = read_address_pointers(
                 client.py_handle.handle,
                 client.base_address,
@@ -82,9 +82,10 @@ class MemoryWatch(Thread):
         class_name = reference.__class__.__name__
 
         assert isinstance(registry_entry, RegistryEntry)
-        logger.debug("%s: registering %s%r" % (
+        logger.debug(
+            "%s: registering %s%r",
             cls.__name__, class_name, registry_entry.attribute_path
-        ))
+        )
         cls._registry[reference].append(registry_entry)
 
     @classmethod

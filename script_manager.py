@@ -37,7 +37,7 @@ class ScriptManager(object):
     def run_one(self, file_name, loop=False):
         if file_name not in self.files:
             raise ScriptManagerException(
-                '%s does not exist or could not be found' % file_name
+                '%s could not be found' % file_name
             )
 
         while True:
@@ -56,7 +56,7 @@ class ScriptManager(object):
         module = importlib.import_module(module_path)
         script = module.Script
 
-        _verify_script(script,)
+        _verify_script(script)
 
         return script
 
