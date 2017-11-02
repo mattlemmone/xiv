@@ -3,14 +3,14 @@ from ctypes.wintypes import c_uint
 from ctypes.wintypes import c_ulonglong
 from munch import Munch
 
-from entity import Entity
-from memory import MemoryWatch
-from memory import RegistryEntry
-from offsets import entity_base_offsets
-from offsets import player_parameter_offsets
-from pointers import base_pointers
-from pointers import single_level_pointers
-from singleton import Singleton
+from core.entity import Entity
+from core.offsets import entity_base_offsets
+from core.offsets import player_parameter_offsets
+from core.pointers import base_pointers
+from core.pointers import single_level_pointers
+from lib.memory import MemoryWatch
+from lib.memory import RegistryEntry
+from lib.singleton import Singleton
 
 
 class Player(Entity):

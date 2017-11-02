@@ -3,8 +3,8 @@ import logging
 import os
 import importlib
 
-from error import ScriptManagerException
-from error import ScriptDesignException
+from core.error import ScriptManagerException
+from core.error import ScriptDesignException
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

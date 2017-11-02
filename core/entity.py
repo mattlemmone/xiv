@@ -3,11 +3,11 @@ from ctypes.wintypes import c_uint
 from ctypes.wintypes import create_string_buffer
 from munch import Munch
 
-from memory import RegistryEntry
-from memory import MemoryWatch
-from offsets import entity_base_offsets
-from structs import Parameters
-from structs import Position
+from core.offsets import entity_base_offsets
+from core.structs import Parameters
+from core.structs import Position
+from lib.memory import MemoryWatch
+from lib.memory import RegistryEntry
 
 MAX_NAME_LENGTH = 32
 
@@ -24,6 +24,9 @@ class Entity(object):
         self.position = Position
 
         self._register_all_entries()
+
+    def __repr__(self):
+        return str(self.__dict__)
 
     def _register_all_entries(self):
         """

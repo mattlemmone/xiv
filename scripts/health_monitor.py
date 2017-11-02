@@ -1,8 +1,8 @@
 import logging
 import time
-from script_manager import BaseScript
 
-from player import Player
+from core.player import Player
+from core.script_manager import BaseScript
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)

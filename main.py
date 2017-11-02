@@ -1,11 +1,11 @@
 from threading import Thread
 import logging
 
-from memory import MemoryWatch
-from player import Player
-import client
-import process
-from script_manager import ScriptManager
+from lib.memory import MemoryWatch
+from core.player import Player
+from lib import client
+from lib import process
+from core.script_manager import ScriptManager
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
