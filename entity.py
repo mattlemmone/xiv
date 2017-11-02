@@ -1,12 +1,11 @@
-from ctypes.wintypes import create_string_buffer
 from ctypes.wintypes import c_float
 from ctypes.wintypes import c_uint
+from ctypes.wintypes import create_string_buffer
 from munch import Munch
 
 from memory import RegistryEntry
 from memory import MemoryWatch
 from offsets import entity_base_offsets
-from pointers import base_pointers
 from structs import Parameters
 from structs import Position
 

@@ -1,10 +1,11 @@
-import logging
 from threading import Thread
+import logging
 
 from memory import MemoryWatch
 from player import Player
 import client
 import process
+from script_manager import ScriptManager
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -22,21 +23,21 @@ def create_registry_singletons():
     Player()
 
 
-def execute_scripts():
-    while True:
-        logger.debug('execute_scripts')
-
-
 def main():
     initialize_client_data()
 
-    mem_watch = MemoryWatch(poll_rate=1)
+    mem_watch = MemoryWatch(poll_rate=200)
     mem_watch.find_base_pointers()
 
     # Must create singletons after pointers are found
     create_registry_singletons()
+
+    # Start memory watch thread
     mem_watch.start()
-    # execute_scripts()
+
+    # Execute scripts
+    script_manager = ScriptManager()
+    script_manager.run_all()
 
 
 if __name__ == "__main__":

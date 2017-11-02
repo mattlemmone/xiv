@@ -3,6 +3,7 @@ from ctypes.wintypes import c_uint
 from ctypes.wintypes import c_ulonglong
 from munch import Munch
 
+from entity import Entity
 from memory import MemoryWatch
 from memory import RegistryEntry
 from offsets import entity_base_offsets
@@ -10,8 +11,6 @@ from offsets import player_parameter_offsets
 from pointers import base_pointers
 from pointers import single_level_pointers
 from singleton import Singleton
-
-from entity import Entity
 
 
 class Player(Entity):

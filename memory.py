@@ -7,6 +7,7 @@ from ctypes.wintypes import LPVOID
 from ctypes.wintypes import POINTER
 import ctypes
 import logging
+import time
 from threading import Thread
 
 import client
@@ -30,7 +31,8 @@ GetLastError.argtypes = None
 GetLastError.restype = DWORD
 # end Ctype RPM constants
 
-DEFAULT_POLL_RATE = 1
+# Milliseconds
+DEFAULT_POLL_RATE = 100
 
 
 class RegistryEntry(object):
@@ -97,19 +99,18 @@ class MemoryWatch(Thread):
         logger.debug('memwatch started')
         handle = client.py_handle.handle
         while True:
-            logger.debug('-' * 40)
             for reference, entry_dict in self._registry.items():
                 for entry in entry_dict:
                     new_value = read_address(handle, entry.address, entry.data_type)
                     _reference_update(
                         entry.reference, entry.attribute_path, new_value
                     )
-                    logger.debug('Updated {:22s} {:29s} --> {:15s}'.format(
-                        entry.description, entry.attribute_path, str(new_value)
-                    ))
+                    # logger.debug('Updated {:22s} {:29s} --> {:15s}'.format(
+                    #     entry.description, entry.attribute_path, str(new_value)
+                    # ))
+            # logger.debug('-' * 40)
 
-            import time
-            time.sleep(poll_rate)
+            time.sleep(poll_rate / 1000)
 
 
 def _reference_update(reference, attribute_path, new_value):
