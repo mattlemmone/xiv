@@ -16,12 +16,11 @@ BLACKLISTED_FILES = frozenset(['__init__.py'])
 
 
 class BaseScript(object):
+    """
+    All scripts should inherit this type!
+    """
     __metaclass__ = abc.ABCMeta
     script_active = True
-
-    def __init__(self, name, author):
-        self.name = name
-        self.author = author
 
     @abc.abstractmethod
     def run(self):
@@ -42,7 +41,11 @@ class ScriptManager(object):
 
         while True:
             self.current_script = self._load_script(file_name)
-            self.current_script.run()
+
+            if self.current_script.script_active:
+                self.current_script.run()
+            else:
+                logger.debug('Script %s is not active, skipping...', file_name)
 
             if not loop:
                 break
