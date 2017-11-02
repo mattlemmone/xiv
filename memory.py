@@ -6,12 +6,15 @@ from ctypes.wintypes import LPCVOID
 from ctypes.wintypes import LPVOID
 from ctypes.wintypes import POINTER
 import ctypes
-
+import logging
+from threading import Thread
 
 import client
 from pointers import base_pointers
 from singleton import Singleton
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 # Ctype RPM constants
 k32 = ctypes.WinDLL('kernel32', use_last_error=True)
@@ -48,18 +51,23 @@ class RegistryEntry(object):
             self.address += client.base_address
 
 
-class MemoryWatch(object):
+class MemoryWatch(Thread):
     __metaclass__ = Singleton
     _registry = defaultdict(list)
+
+    def __init__(self, poll_rate):
+        self.poll_rate = poll_rate
+        Thread.__init__(self)
+        self.daemon = True
 
     def find_base_pointers(self):
         """
         Updates/resolves all pointer addresses so they can be referenced for
         immediate memory reads
         """
-        print "Finding pointers..."
+        logger.debug("Finding pointers...")
         for name, pointer in base_pointers.items():
-            print "Resolving %s pointer @ %s..." % (name, pointer.offsets)
+            logger.debug("Resolving %s pointer @ %s..." % (name, pointer.offsets))
             pointer.address = read_address_pointers(
                 client.py_handle.handle,
                 client.base_address,
@@ -72,9 +80,9 @@ class MemoryWatch(object):
         class_name = reference.__class__.__name__
 
         assert isinstance(registry_entry, RegistryEntry)
-        print "%s: registering %s%r" % (
+        logger.debug("%s: registering %s%r" % (
             cls.__name__, class_name, registry_entry.attribute_path
-        )
+        ))
         cls._registry[reference].append(registry_entry)
 
     @classmethod
@@ -82,22 +90,23 @@ class MemoryWatch(object):
         removed = cls._registry.pop(reference, None)
         assert removed, 'Couldnt remove reference from registry!'
 
-    def start(self, poll_rate=DEFAULT_POLL_RATE):
+    def run(self, poll_rate=DEFAULT_POLL_RATE):
         """
         Reads items from registry, updates them via reference, sleeps, repeats
         """
+        logger.debug('memwatch started')
         handle = client.py_handle.handle
         while True:
-            print '-' * 40
+            logger.debug('-' * 40)
             for reference, entry_dict in self._registry.items():
                 for entry in entry_dict:
                     new_value = read_address(handle, entry.address, entry.data_type)
                     _reference_update(
                         entry.reference, entry.attribute_path, new_value
                     )
-                    print 'Updated {:22s} {:29s} --> {:15s}'.format(
+                    logger.debug('Updated {:22s} {:29s} --> {:15s}'.format(
                         entry.description, entry.attribute_path, str(new_value)
-                    )
+                    ))
 
             import time
             time.sleep(poll_rate)
@@ -142,6 +151,6 @@ def read_address_pointers(handle_id, base_address, offsets):
             continue
         result = read_address(handle_id, result + offset, temp_buffer)
         output = '%s -> %d) %s' % (output, idx + 1, hex(result))
-    print output
-    print "Resolved --> %s" % hex(result)
+    logger.debug(output)
+    logger.debug("Resolved --> %s", hex(result))
     return result
