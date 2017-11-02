@@ -21,6 +21,11 @@ entity_base_offsets = Munch(
     max_hp=0x16A8 + 4,
     current_mp=0x16A8 + 8,
     max_mp=0x16A8 + 12,
+
+    # Fun stuff
+    jump_height=0x8A4,
+    jump_dir_1=0x870,
+    jump_dir_2=0x870 + 8,
 )
 
 player_parameter_offsets = Munch(

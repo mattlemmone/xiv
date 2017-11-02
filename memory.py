@@ -52,9 +52,6 @@ class MemoryWatch(object):
     __metaclass__ = Singleton
     _registry = defaultdict(list)
 
-    def __init__(self, client):
-        self.client = client
-
     def find_base_pointers(self):
         """
         Updates/resolves all pointer addresses so they can be referenced for
@@ -64,8 +61,8 @@ class MemoryWatch(object):
         for name, pointer in base_pointers.items():
             print "Resolving %s pointer @ %s..." % (name, pointer.offsets)
             pointer.address = read_address_pointers(
-                self.client.py_handle.handle,
-                self.client.base_address,
+                client.py_handle.handle,
+                client.base_address,
                 pointer.offsets,
             )
 
@@ -89,7 +86,7 @@ class MemoryWatch(object):
         """
         Reads items from registry, updates them via reference, sleeps, repeats
         """
-        handle = self.client.py_handle.handle
+        handle = client.py_handle.handle
         while True:
             print '-' * 40
             for reference, entry_dict in self._registry.items():

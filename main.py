@@ -19,7 +19,7 @@ def create_registry_singletons():
 def main():
     initialize_client_data()
 
-    mem_watch = MemoryWatch(client=client)
+    mem_watch = MemoryWatch()
     mem_watch.find_base_pointers()
 
     # Must create singletons after pointers are found
