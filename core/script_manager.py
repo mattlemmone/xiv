@@ -50,9 +50,9 @@ class ScriptManager(object):
             if not loop:
                 break
 
-    def run_all(self, loop=False):
+    def run_all(self):
         for file in self.files:
-            self.run_one(file, loop)
+            self.run_one(file)
 
     def _load_script(self, file_name):
         module_path = '%s.%s' % (SCRIPT_PATH, file_name)

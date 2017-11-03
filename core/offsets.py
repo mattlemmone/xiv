@@ -14,7 +14,7 @@ entity_base_offsets = Munch(
     x=0xA0,
     z=0xA0 + 4,
     y=0xA0 + 8,
-    heading=0xB0,
+    heading=0xA0 + 16,
 
     # Parameters without TP
     current_hp=0x16A8,

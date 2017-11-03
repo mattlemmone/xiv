@@ -23,7 +23,7 @@ base_pointers = Munch(
 
 # noticed enemies have an offset that represent their distance from me...
 # idea: search for address of player base in memory, find out what up
-single_level_pointers = Munch(
+static_pointers = Munch(
     player_target=MemoryPointer(0x1801A10),
     player_speed=MemoryPointer(0x1805768)
 )

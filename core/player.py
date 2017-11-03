@@ -7,7 +7,7 @@ from core.entity import Entity
 from core.offsets import entity_base_offsets
 from core.offsets import player_parameter_offsets
 from core.pointers import base_pointers
-from core.pointers import single_level_pointers
+from core.pointers import static_pointers
 from lib.memory import MemoryWatch
 from lib.memory import RegistryEntry
 from lib.singleton import Singleton
@@ -32,8 +32,8 @@ class Player(Entity):
             return
 
         # Target changed
-        if self.target_entity:
-            MemoryWatch.unregister_by_ref(self.target_entity)
+        if self.target_entity and self._target_address:
+            MemoryWatch.unregister_by_address(self._target_address)
         if new_target_address:
             self.target_entity = Entity(new_target_address)
         self._target_address = new_target_address
@@ -66,6 +66,7 @@ class Player(Entity):
             x=self._build_registry_entry('player base', 'x', 'position x', c_float()),
             y=self._build_registry_entry('player base', 'y', 'position y', c_float()),
             z=self._build_registry_entry('player base', 'z', 'position z', c_float()),
+            heading=self._build_registry_entry('player base', 'heading', 'position heading', c_float()),
 
             # Misc
             target_address=self._build_registry_entry(
@@ -99,7 +100,7 @@ class Player(Entity):
             pointer = base_pointers.entity_base
             offset = entity_base_offsets[offset_name]
         elif 'target address' in description:
-            pointer = single_level_pointers.player_target
+            pointer = static_pointers.player_target
         else:
             print 'error on %s %s' % (description, attribute_path_str)
         return RegistryEntry(
