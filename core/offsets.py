@@ -40,7 +40,7 @@ player_parameter_offsets = Munch(
 
 player_skill_offsets = Munch(
     class_id=0x3C,
-    skill_type=0x3C + 4,
+    type=0x3C + 4,
     skill_id=0x3C + 12,
     ready_percent=0x3C + 20,
     tp_cost=0x3C + 28,

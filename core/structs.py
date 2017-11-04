@@ -18,7 +18,7 @@ class Position(object):
 class Skill(object):
     def __init__(self):
         self.class_id = None
-        self.skill_type = None
+        self.type = None
         self.skill_id = None
         self.ready_percent = None
         self.tp_cost = None

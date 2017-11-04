@@ -91,9 +91,8 @@ def go_to_enemy(enemy):
 
     # Set target, face it, run to it
     player.set_target(enemy.address)
-    KeyboardInput.key_press('f')
 
-    # Distance tolerance can be set higher for ranged classes
+    KeyboardInput.key_press('f')
     MovementEngine.run_to(enemy.position, tolerance=5)
 
 
@@ -111,5 +110,3 @@ def fight_enemy(enemy):
 
         my_rotation.execute()
         time.sleep(1)
-
-
