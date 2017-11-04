@@ -41,9 +41,8 @@ class Player(Entity):
     @staticmethod
     def set_target(target_address):
         writable_address = client.base_address + static_pointers.player_target.address
-        handle = client.py_handle.handle
         data = c_ulonglong(target_address)
-        write_address(handle, writable_address, data)
+        write_address(writable_address, data)
 
     @property
     def target_address(self):
@@ -156,7 +155,6 @@ class Player(Entity):
             pointer = multi_level_pointers.player_skills
             offset = player_skill_offsets[offset_name]
             offset += skill_size * multiple
-            print attribute_path_str, hex(pointer.address), hex(offset)
         else:
             print 'error on %s %s' % (description, attribute_path_str)
         return RegistryEntry(

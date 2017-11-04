@@ -1,10 +1,13 @@
+from ctypes.wintypes import c_float
 import logging
 import math
 
 from core.player import Player
+from core.pointers import multi_level_pointers
+from core.offsets import entity_base_offsets
 from core.structs import Position
 from lib.input import KeyboardInput
-from lib.input import MouseInput
+from lib.memory import write_address
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -13,16 +16,15 @@ logger = logging.getLogger(__name__)
 class MovementEngine(object):
 
     @staticmethod
-    def run_to(destination, rotate=False, tolerance=2):
+    def run_to(destination, tolerance=3, key_up=True):
         """
         Primitively runs a straight line (x,y)
         """
         _validate_position(destination)
         position = Player().position
 
-        if rotate:
-            MovementEngine._rotate(position, destination)
-        MovementEngine._run(position, destination, tolerance)
+        MovementEngine._rotate(position, destination)
+        MovementEngine._run(position, destination, tolerance, key_up)
 
         logger.debug('arrived')
 
@@ -31,8 +33,13 @@ class MovementEngine(object):
         """
         Primitively runs a straight line (x,y)
         """
+        waypoints = list(waypoints)
+        last_idx = len(waypoints) - 1
         for idx, waypoint in enumerate(waypoints):
-            MovementEngine.run_to(waypoint, 1)
+            # Don't lift key up unless last waypoint reached
+            MovementEngine.run_to(
+                waypoint, tolerance=2, key_up=idx==last_idx
+            )
 
     @staticmethod
     def teleport_to(destination):
@@ -58,7 +65,7 @@ class MovementEngine(object):
         return round(heading - math.pi, 2)
 
     @staticmethod
-    def _rotate(position, destination):
+    def _rotate(position, destination, threshold=0.04):
         logger.debug('rotating')
         radian_diff = -math.atan2(
             destination.y - position.y,
@@ -71,33 +78,27 @@ class MovementEngine(object):
         logger.debug('converted %f (%d degrees) to %f', radian_diff, math.degrees(radian_diff), next_heading)
         logger.debug('next heading: %f', next_heading)
 
-        # Dont rotate if unnecessary - too awkward
-        if abs(position.heading - next_heading) <= 0.02:
+        # Avoid needless rotate
+        if abs(next_heading - position.heading) <= threshold:
             return
 
-        key = 'd'
-        if next_heading > position.heading:
-            if 0 <= position.heading <= 3.14:
-                key = 'a'
-        else:
-            if -3.14 <= position.heading <= 0:
-                key = 'a'
-
-        KeyboardInput.key_down(key)
-
-        while abs(position.heading - next_heading) > 0.02:
-            pass
-        KeyboardInput.key_up(key)
+        # Write new heading to memory
+        heading_address = multi_level_pointers.entity_base.address
+        heading_address += entity_base_offsets.heading
+        data = c_float(next_heading)
+        write_address(heading_address, data)
+        KeyboardInput.key_press('a', delay=50)
 
     @staticmethod
-    def _run(position, destination, tolerance):
+    def _run(position, destination, tolerance, key_up):
         logger.debug('running')
         KeyboardInput.key_down('w')
 
         distance = float('inf')
         while abs(distance) > tolerance:
             distance = MovementEngine.get_2d_distance(position, destination)
-        KeyboardInput.key_up('w')
+        if key_up:
+            KeyboardInput.key_up('w')
 
     @staticmethod
     def get_2d_distance(start, end):

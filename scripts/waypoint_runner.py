@@ -1,3 +1,4 @@
+from copy import deepcopy
 import logging
 import time
 
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 # All scripts must inherit from BaseScript
 class Script(BaseScript):
     # True by default, even without this next line.
-    script_active = False
+    script_active = True
 
     # 'run' is the entry point of the script
     @staticmethod
@@ -21,23 +22,22 @@ class Script(BaseScript):
         waypoints = record_waypoints()
 
         # Use the movement system to run to each waypoint backwards!
-        MovementEngine.run_waypoints(reversed(waypoints), rotate=True)
+        MovementEngine.run_waypoints(reversed(waypoints))
 
 
-def record_waypoints(step=1000, duration=4000):
+def record_waypoints(step=500, duration=10000):
     """
     Records a waypoint every step (ms) for duration (ms)
     """
     waypoints = []
-    counter = 0
     player = Player()
 
-    while counter < duration:
+    start_time = time.time()
+    while time.time() - start_time < duration / 1000:
         logger.debug('recording waypoint... %r', player.position)
-        waypoints.append(player.position.copy())
+        waypoints.append(deepcopy(player.position))
 
-        counter += step
-        time.sleep(step / 1000)
+        time.sleep(step / 1000.0)
 
     logger.debug('stop moving!')
     time.sleep(2)

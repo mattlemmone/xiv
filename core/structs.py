@@ -14,6 +14,9 @@ class Position(object):
         self.z = None
         self.heading = None
 
+    def __repr__(self):
+        return str(self.__dict__)
+
 
 class Skill(object):
     def __init__(self):

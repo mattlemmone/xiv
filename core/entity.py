@@ -12,7 +12,6 @@ from core.offsets import entity_size
 from core.pointers import multi_level_pointers
 from core.structs import Parameters
 from core.structs import Position
-from lib import client
 from lib.memory import MemoryWatch
 from lib.memory import RegistryEntry
 from lib.memory import read_address
@@ -114,9 +113,8 @@ class Entity(object):
 
 
 def get_entity_list():
-    handle = client.py_handle.handle
     player_address = multi_level_pointers.entity_base.address
-    entity_ptr_value = read_address(handle, player_address, c_ulonglong())
+    entity_ptr_value = read_address(player_address, c_ulonglong())
     assert entity_ptr_value, 'Player base not found...?!'
 
     # Start with a fresh list
