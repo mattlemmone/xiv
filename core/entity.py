@@ -1,16 +1,27 @@
 from ctypes.wintypes import c_float
 from ctypes.wintypes import c_uint
+from ctypes.wintypes import c_ulonglong
 from ctypes.wintypes import create_string_buffer
 from munch import Munch
+import logging
+import time
 
 from core.offsets import entity_base_offsets
+from core.offsets import entity_size
+from core.pointers import base_pointers
 from core.structs import Parameters
 from core.structs import Position
+from lib import client
 from lib.memory import MemoryWatch
 from lib.memory import RegistryEntry
+from lib.memory import read_address
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 MAX_NAME_LENGTH = 32
-
+ENTITY_LIST_SIZE = 64
+previous_entity_list = []
 
 class Entity(object):
 
@@ -18,17 +29,25 @@ class Entity(object):
         self.REGISTRY_MAP = Munch()
         self.NAME_BUFFER = create_string_buffer('_' * MAX_NAME_LENGTH)
 
-        self.address = address
         self.name = None
-        self.parameters = Parameters
-        self.position = Position
+        self.address = address
+        self.parameters = Parameters.copy()
+        self.position = Position.copy()
 
-        self._register_all_entries()
+        self.register()
 
     def __repr__(self):
-        return str(self.__dict__)
+        return str({
+            'name': self.name,
+            'address': hex(self.address),
+            'parameters': self.parameters,
+            'position': self.position,
+        })
 
-    def _register_all_entries(self):
+    def unregister(self):
+        MemoryWatch.unregister_by_address(self.address)
+
+    def register(self):
         """
         Registers every attribute found in REGISTRY_MAP.
         """
@@ -87,3 +106,34 @@ class Entity(object):
         )
 
 
+def get_entity_list():
+    handle = client.py_handle.handle
+    player_address = base_pointers.entity_base.address
+    entity_ptr_value = read_address(handle, player_address, c_ulonglong())
+    assert entity_ptr_value, 'Player base not found...?!'
+
+    # Start with a fresh list
+    clear_entities_from_memory()
+
+    # Start at first non-self entity
+    entity_address = player_address + entity_size
+    entity_list = []
+
+    for _ in xrange(ENTITY_LIST_SIZE):
+        new_entity = Entity(entity_address)
+        entity_list.append(new_entity)
+        entity_address += entity_size
+
+    global previous_entity_list
+    previous_entity_list = entity_list
+
+    # Pause for MemoryWatch to gather data
+    time.sleep(.05)
+
+    return entity_list
+
+
+def clear_entities_from_memory():
+    global previous_entity_list
+    for entity in previous_entity_list:
+        MemoryWatch.unregister_by_address(entity.address)

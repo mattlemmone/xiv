@@ -19,7 +19,10 @@ class Player(Entity):
     def __init__(self):
         self._target_address = None
         self.target_entity = None
-        super(Player, self).__init__(address=None)
+
+        super(Player, self).__init__(
+            address=base_pointers.entity_base.address
+        )
 
     @property
     def target_address(self):
@@ -33,7 +36,11 @@ class Player(Entity):
 
         # Target changed
         if self.target_entity and self._target_address:
-            MemoryWatch.unregister_by_address(self._target_address)
+            # Dont unregister yourself!
+            if self.address != self._target_address:
+                MemoryWatch.unregister_by_address(self._target_address)
+
+        # Create new entity
         if new_target_address:
             self.target_entity = Entity(new_target_address)
         self._target_address = new_target_address

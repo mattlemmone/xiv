@@ -9,18 +9,11 @@ from lib.input import MouseInput
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-KEY = Munch(
-    W=0x57,
-    A=0x41,
-    S=0x53,
-    D=0x44,
-)
-
 
 class MovementEngine(object):
 
     @staticmethod
-    def run_to(destination, invert_heading):
+    def run_to(destination):
         """
         Primitively runs a straight line (x,y)
         """
@@ -34,14 +27,14 @@ class MovementEngine(object):
 
         next_heading = MovementEngine.radians_to_heading(radian_diff)
         next_heading = round(next_heading, 2)
+
         logger.debug('converted %f (%d degrees) to %f', radian_diff, math.degrees(radian_diff), next_heading)
         logger.debug('next heading: %f', next_heading)
 
-        # Rotate
         MovementEngine._rotate(position, next_heading)
-
-        # Run
         MovementEngine._run(position, destination)
+
+        logger.debug('arrived')
 
     @staticmethod
     def run_waypoints(waypoints):
@@ -82,29 +75,34 @@ class MovementEngine(object):
         if abs(position.heading - next_heading) <= 0.02:
             return
 
-        key = KEY.D
+        key = 'd'
         if next_heading > position.heading:
             if 0 <= position.heading <= 3.14:
-                key = KEY.A
+                key = 'a'
         else:
             if -3.14 <= position.heading <= 0:
-                key = KEY.A
+                key = 'a'
 
         KeyboardInput.key_down(key)
 
-        while abs(position.heading - next_heading) > 0.02:
+        while abs(position.heading - next_heading) > 0.04:
             pass
         KeyboardInput.key_up(key)
 
     @staticmethod
     def _run(position, destination):
         logger.debug('running')
-        KeyboardInput.key_down(KEY.W)
+        KeyboardInput.key_down('w')
 
         distance = float('inf')
-        while abs(distance) > 1:
-            distance = _get_distance(position, destination)
-        KeyboardInput.key_up(KEY.W)
+        while abs(distance) > 3:
+            distance = MovementEngine.get_2d_distance(position, destination)
+        KeyboardInput.key_up('w')
+
+    @staticmethod
+    def get_2d_distance(start, end):
+        distance = math.sqrt((end.x - start.x)**2 + (end.y - start.y)**2)
+        return distance
 
 
 def _validate_position(position):
@@ -114,6 +112,3 @@ def _validate_position(position):
         assert position.z
 
 
-def _get_distance(start, end):
-    distance = math.sqrt((end.x - start.x)**2 + (end.y - start.y)**2)
-    return distance

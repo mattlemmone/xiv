@@ -35,3 +35,5 @@ player_parameter_offsets = Munch(
     max_mp=0x00 + 12,
     tp=0x00 + 16,
 )
+
+entity_size = 0x2930
