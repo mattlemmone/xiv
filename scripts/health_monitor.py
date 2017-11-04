@@ -23,7 +23,7 @@ class Script(BaseScript):
         while True:
             time.sleep(1)
             if player.parameters.current_hp == 0:
-                last_target = player.target_entity.name
+                last_target = player.target.name
                 logger.warning(
                     'U fuckin died m8! Last target was %s', last_target
                 )

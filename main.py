@@ -27,7 +27,7 @@ def main():
     initialize_client_data()
 
     mem_watch = MemoryWatch(poll_rate=200)
-    mem_watch.find_base_pointers()
+    mem_watch.find_multi_level_pointers()
 
     # Must create singletons after pointers are found
     create_registry_singletons()

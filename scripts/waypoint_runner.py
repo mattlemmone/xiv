@@ -21,7 +21,7 @@ class Script(BaseScript):
         waypoints = record_waypoints()
 
         # Use the movement system to run to each waypoint backwards!
-        MovementEngine.run_waypoints(reversed(waypoints))
+        MovementEngine.run_waypoints(reversed(waypoints), rotate=True)
 
 
 def record_waypoints(step=1000, duration=4000):

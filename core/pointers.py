@@ -3,7 +3,7 @@ from munch import Munch
 
 class MemoryPointer(object):
     def __init__(self, offsets):
-        # Resolved by MemoryWatch.find_all_base_pointers iff offsets is a list
+        # Resolved by MemoryWatch.find_all_multi_level_pointers iff offsets is a list
         self.address = None
 
         if isinstance(offsets, list):
@@ -12,12 +12,16 @@ class MemoryPointer(object):
             self.address = offsets
 
 # Base pointers will be resolved and stored ONCE per run.
-base_pointers = Munch(
+multi_level_pointers = Munch(
     # all enemies in area are + 0x2930 from player base! about 64?
     # found by scanning hex for the 1st value in player base!
     entity_base=MemoryPointer([0x01802E50]),
     player_parameters=MemoryPointer(
         [0x01807FB8, 0x30, 0x58, 0x18, 0x20]
+    ),
+    player_skills=MemoryPointer(
+        [0x01857E90]
+        # [0x01807FB8, 0x30, 0x58, 0x30, 0x20]
     )
 )
 

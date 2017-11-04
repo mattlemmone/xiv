@@ -9,6 +9,8 @@ entity_base_offsets = Munch(
     # Misc
     name=0x30,
     distance=0x8D,
+    level=0x16E0,
+    is_fighting=0x3A9,
 
     # Position
     x=0xA0,
@@ -36,4 +38,14 @@ player_parameter_offsets = Munch(
     tp=0x00 + 16,
 )
 
+player_skill_offsets = Munch(
+    class_id=0x3C,
+    skill_type=0x3C + 4,
+    skill_id=0x3C + 12,
+    ready_percent=0x3C + 20,
+    tp_cost=0x3C + 28,
+    in_range=0x3C + 36
+)
+
 entity_size = 0x2930
+skill_size = 0x28

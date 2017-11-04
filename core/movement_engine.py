@@ -1,8 +1,8 @@
 import logging
 import math
-from munch import Munch
 
 from core.player import Player
+from core.structs import Position
 from lib.input import KeyboardInput
 from lib.input import MouseInput
 
@@ -13,26 +13,16 @@ logger = logging.getLogger(__name__)
 class MovementEngine(object):
 
     @staticmethod
-    def run_to(destination):
+    def run_to(destination, rotate=False, tolerance=2):
         """
         Primitively runs a straight line (x,y)
         """
         _validate_position(destination)
         position = Player().position
 
-        radian_diff = -math.atan2(
-            destination.y - position.y,
-            destination.x - position.x
-        )
-
-        next_heading = MovementEngine.radians_to_heading(radian_diff)
-        next_heading = round(next_heading, 2)
-
-        logger.debug('converted %f (%d degrees) to %f', radian_diff, math.degrees(radian_diff), next_heading)
-        logger.debug('next heading: %f', next_heading)
-
-        MovementEngine._rotate(position, next_heading)
-        MovementEngine._run(position, destination)
+        if rotate:
+            MovementEngine._rotate(position, destination)
+        MovementEngine._run(position, destination, tolerance)
 
         logger.debug('arrived')
 
@@ -68,8 +58,18 @@ class MovementEngine(object):
         return round(heading - math.pi, 2)
 
     @staticmethod
-    def _rotate(position, next_heading):
+    def _rotate(position, destination):
         logger.debug('rotating')
+        radian_diff = -math.atan2(
+            destination.y - position.y,
+            destination.x - position.x
+        )
+
+        next_heading = MovementEngine.radians_to_heading(radian_diff)
+        next_heading = round(next_heading, 2)
+
+        logger.debug('converted %f (%d degrees) to %f', radian_diff, math.degrees(radian_diff), next_heading)
+        logger.debug('next heading: %f', next_heading)
 
         # Dont rotate if unnecessary - too awkward
         if abs(position.heading - next_heading) <= 0.02:
@@ -85,17 +85,17 @@ class MovementEngine(object):
 
         KeyboardInput.key_down(key)
 
-        while abs(position.heading - next_heading) > 0.04:
+        while abs(position.heading - next_heading) > 0.02:
             pass
         KeyboardInput.key_up(key)
 
     @staticmethod
-    def _run(position, destination):
+    def _run(position, destination, tolerance):
         logger.debug('running')
         KeyboardInput.key_down('w')
 
         distance = float('inf')
-        while abs(distance) > 3:
+        while abs(distance) > tolerance:
             distance = MovementEngine.get_2d_distance(position, destination)
         KeyboardInput.key_up('w')
 
@@ -106,7 +106,7 @@ class MovementEngine(object):
 
 
 def _validate_position(position):
-        assert isinstance(position, Munch)
+        assert isinstance(position, Position)
         assert position.x
         assert position.y
         assert position.z
