@@ -1,9 +1,10 @@
 import logging
 
 from ctypes.wintypes import c_float
+from ctypes.wintypes import c_ubyte
 from ctypes.wintypes import c_uint
 from ctypes.wintypes import c_ulonglong
-from ctypes.wintypes import c_ubyte
+from ctypes.wintypes import create_string_buffer
 from munch import Munch
 
 from core.entity import Entity
@@ -23,6 +24,9 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 NUM_SKILLS = 10
+
+MAX_NAME_LENGTH = 32
+NAME_BUFFER = create_string_buffer('_' * MAX_NAME_LENGTH)
 
 
 class Player(Entity):
@@ -88,7 +92,7 @@ class Player(Entity):
 
             # Player Base
             name=self._build_registry_entry(
-                'player base', 'name', data_type=self.NAME_BUFFER
+                'player base', 'name', data_type=NAME_BUFFER
             ),
             level=self._build_registry_entry(
                 'player base', 'level', data_type=c_ubyte()

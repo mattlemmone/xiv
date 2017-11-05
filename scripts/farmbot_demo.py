@@ -1,7 +1,7 @@
 import logging
 import time
 
-from core.entity import get_entity_list
+from core.client import Client
 from core.movement_engine import MovementEngine
 from core.player import Player
 from core.script_manager import BaseScript
@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 # All scripts must inherit from BaseScript
 class Script(BaseScript):
     # True by default, even without this next line.
-    script_active = True
+    script_active = False
 
     # 'run' is the entry point of the script
     @staticmethod
@@ -40,18 +40,15 @@ class Script(BaseScript):
 
 
 def get_nearest_enemy():
-    """
-    Would make sense to have more filters like is_claimed, etc
-    for actual usage.
-    """
     player = Player()
+    client = Client()
 
     # Exclude mobs this much higher/lower than you
     MAX_LVL = 1
     MIN_LVL = 2
 
     # Gets all entities loaded in memory, <= 63
-    entity_list = get_entity_list()
+    entity_list = client.get_entity_list()
 
     min_dist = float('inf')
     nearest_enemy = None
@@ -67,9 +64,13 @@ def get_nearest_enemy():
         if entity.level > player.level + MAX_LVL:
             continue
 
-        distance = MovementEngine.get_2d_distance(
-            player.position, entity.position
-        )
+        distance = None
+        try:
+            distance = MovementEngine.get_2d_distance(
+                player.position, entity.position
+            )
+        except Exception:
+            import ipdb; ipdb.set_trace()
 
         if distance < min_dist:
             nearest_enemy = entity
