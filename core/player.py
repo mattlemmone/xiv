@@ -12,7 +12,7 @@ from core.offsets import player_parameter_offsets
 from core.offsets import player_skill_offsets
 from core.offsets import skill_size
 from core.pointers import multi_level_pointers
-from core.pointers import static_pointers
+from core.pointers import single_level_pointers
 from core.structs import Skill
 from lib import client
 from lib.memory import MemoryWatch
@@ -40,7 +40,7 @@ class Player(Entity):
 
     @staticmethod
     def set_target(target_address):
-        writable_address = client.base_address + static_pointers.player_target.address
+        writable_address = single_level_pointers.player_target.address
         data = c_ulonglong(target_address)
         write_address(writable_address, data)
 
@@ -150,7 +150,7 @@ class Player(Entity):
             pointer = multi_level_pointers.entity_base
             offset = entity_base_offsets[offset_name]
         elif 'target address' in description:
-            pointer = static_pointers.player_target
+            pointer = single_level_pointers.player_target
         elif 'skill' in description:
             pointer = multi_level_pointers.player_skills
             offset = player_skill_offsets[offset_name]
@@ -160,5 +160,5 @@ class Player(Entity):
         return RegistryEntry(
             reference=self, description=description, attribute_path=attribute_path_str.split(),
             address=pointer.address, offset=offset,
-            data_type=data_type, is_lvl1_ptr=bool(not offset_name)
+            data_type=data_type
         )

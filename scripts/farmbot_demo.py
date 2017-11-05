@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 # All scripts must inherit from BaseScript
 class Script(BaseScript):
     # True by default, even without this next line.
-    script_active = False
+    script_active = True
 
     # 'run' is the entry point of the script
     @staticmethod
@@ -61,8 +61,8 @@ def get_nearest_enemy():
         if not entity.parameters.current_hp:
             continue
 
-        if entity.level < player.level - MIN_LVL:
-            continue
+        # if entity.level < player.level - MIN_LVL:
+        #     continue
 
         if entity.level > player.level + MAX_LVL:
             continue
