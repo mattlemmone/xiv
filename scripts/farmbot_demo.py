@@ -6,7 +6,6 @@ from core.movement_engine import MovementEngine
 from core.player import Player
 from core.script_manager import BaseScript
 from core.skill_rotation import SkillRotation
-from lib.input import KeyboardInput
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -92,8 +91,7 @@ def go_to_enemy(enemy):
     # Set target, face it, run to it
     player.set_target(enemy.address)
 
-    KeyboardInput.key_press('f')
-    MovementEngine.run_to(enemy.position, tolerance=5)
+    MovementEngine.run_to(enemy.position, tolerance=8)
 
 
 def fight_enemy(enemy):

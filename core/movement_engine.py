@@ -44,7 +44,13 @@ class MovementEngine(object):
     @staticmethod
     def teleport_to(destination):
         _validate_position(destination)
-        pass
+
+        # Write new position to memory
+        base_address = multi_level_pointers.entity_base.address
+        for dimension in ['x', 'y', 'z']:
+            address = base_address + entity_base_offsets[dimension]
+            data = c_float(getattr(destination, dimension))
+            write_address(address, data)
 
     @staticmethod
     def radians_to_heading(radians):
