@@ -1,8 +1,6 @@
 import logging
 import yaml
 
-from core.entity import get_entity_list
-from core.movement_engine import MovementEngine
 from core.player import Player
 from core.script_manager import BaseScript
 

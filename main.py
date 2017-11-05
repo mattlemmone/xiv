@@ -3,7 +3,7 @@ import logging
 
 from lib.memory import MemoryWatch
 from core.player import Player
-from lib import client
+from lib import application
 from lib import process
 from core.script_manager import ScriptManager
 
@@ -11,11 +11,11 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def initialize_client_data():
-    client.hwnd = process.get_hwnd(window_name=client.window_name)
-    client.pid = process.get_pid(process_name=client.process_name)
-    client.py_handle = process.get_handle(pid=client.pid)
-    client.base_address = process.get_base_address(pid=client.pid)
+def initialize_application_data():
+    application.hwnd = process.get_hwnd(window_name=application.window_name)
+    application.pid = process.get_pid(process_name=application.process_name)
+    application.py_handle = process.get_handle(pid=application.pid)
+    application.base_address = process.get_base_address(pid=application.pid)
 
 
 def create_registry_singletons():
@@ -24,7 +24,7 @@ def create_registry_singletons():
 
 
 def main():
-    initialize_client_data()
+    initialize_application_data()
 
     mem_watch = MemoryWatch(poll_rate=100)
     mem_watch.resolve_all_pointers()

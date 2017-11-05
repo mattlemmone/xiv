@@ -10,6 +10,7 @@ import time
 from core.offsets import entity_base_offsets
 from core.offsets import entity_size
 from core.pointers import multi_level_pointers
+from core.registerable import Registerable
 from core.structs import Parameters
 from core.structs import Position
 from lib.memory import MemoryWatch
@@ -24,10 +25,9 @@ ENTITY_LIST_SIZE = 64
 entity_address_list = []
 
 
-class Entity(object):
+class Entity(Registerable):
 
     def __init__(self, address):
-        self.REGISTRY_MAP = Munch()
         self.NAME_BUFFER = create_string_buffer('_' * MAX_NAME_LENGTH)
 
         self.name = None
@@ -36,7 +36,7 @@ class Entity(object):
         self.parameters = Parameters()
         self.position = Position()
 
-        self.register()
+        super(Entity, self).__init__()
 
     def __repr__(self):
         return str({
@@ -46,19 +46,6 @@ class Entity(object):
             'parameters': self.parameters,
             'position': self.position,
         })
-
-    def unregister(self):
-        MemoryWatch.unregister_by_address(self.address)
-
-    def register(self):
-        """
-        Registers every attribute found in REGISTRY_MAP.
-        """
-        self._update_registry_map()
-
-        for attribute in self.REGISTRY_MAP:
-            registry_entry = self.REGISTRY_MAP.get(attribute)
-            MemoryWatch.register(registry_entry)
 
     def _update_registry_map(self):
         # Must be called here as pointers are likely already resolved

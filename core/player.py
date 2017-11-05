@@ -14,7 +14,6 @@ from core.offsets import skill_size
 from core.pointers import multi_level_pointers
 from core.pointers import single_level_pointers
 from core.structs import Skill
-from lib import client
 from lib.memory import MemoryWatch
 from lib.memory import RegistryEntry
 from lib.memory import write_address
