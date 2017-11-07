@@ -80,7 +80,7 @@ def get_base_address(pid):
         )
 
     CloseHandle(snapshot)
-
+    print hex(addressof(me32.modBaseAddr.contents))
     # Convert base address from LP_c_byte to long
     return addressof(me32.modBaseAddr.contents)
 

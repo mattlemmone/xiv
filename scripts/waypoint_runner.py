@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 # All scripts must inherit from BaseScript
 class Script(BaseScript):
     # True by default, even without this next line.
-    script_active = False
+    script_active = True
 
     # 'run' is the entry point of the script
     @staticmethod
@@ -23,9 +23,9 @@ class Script(BaseScript):
 
         # Use the movement system to run to each waypoint backwards!
         MovementEngine.run_waypoints(reversed(waypoints))
+        logger.debug('done!')
 
-
-def record_waypoints(step=500, duration=10000):
+def record_waypoints(step=100, duration=10000):
     """
     Records a waypoint every step (ms) for duration (ms)
     """

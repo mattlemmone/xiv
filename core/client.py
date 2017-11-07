@@ -9,11 +9,11 @@ from core.entity import Entity
 from core.offsets import entity_size
 from core.pointers import multi_level_pointers
 from core.pointers import single_level_pointers
-from core.registerable import Registerable
+from core.registry_entries import client_entries
 from lib.memory import MemoryWatch
 from lib.memory import read_address
-from lib.memory import RegistryEntry
 from lib.memory import write_address
+from lib.registerable import Registerable
 from lib.singleton import Singleton
 
 logging.basicConfig(level=logging.DEBUG)
@@ -21,15 +21,16 @@ logger = logging.getLogger(__name__)
 
 ENTITY_LIST_SIZE = 64
 
-MAX_CMD_LENGTH = 64
-CMD_BUFFER = create_string_buffer('_' * MAX_CMD_LENGTH)
-
 NULL_MSG_LENGTH = 1
 NULL_BUFFER = create_string_buffer('_' * NULL_MSG_LENGTH)
 
 
 class Client(Registerable):
+    """
+    Represents the actual game instance.
+    """
     __metaclass__ = Singleton
+    registry_tuple = client_entries
 
     def __init__(self):
         # MemoryWatch's reference to this class is aka the address
@@ -55,27 +56,6 @@ class Client(Registerable):
         if incoming_last_cmd != '_':
             self._last_cmd = incoming_last_cmd
 
-    def _update_registry_map(self):
-        self.REGISTRY_MAP = Munch(
-            last_cmd=self._build_registry_entry(
-                'last_cmd', data_type=CMD_BUFFER
-            ),
-        )
-
-    def _build_registry_entry(
-        self, offset_name, data_type=c_uint(),
-    ):
-        attribute_path_str = offset_name
-        description = 'client %s' % offset_name
-        address = single_level_pointers.last_cmd.address
-        offset = 0
-
-        return RegistryEntry(
-            reference=self, description=description,
-            attribute_path=attribute_path_str.split(),
-            address=address, offset=offset, data_type=data_type
-        )
-
     def get_entity_list(self):
         player_address = multi_level_pointers.entity_base.address
         entity_ptr_value = read_address(player_address, c_ulonglong())
@@ -88,6 +68,7 @@ class Client(Registerable):
         entity_address = player_address + entity_size
         entity_list = []
 
+        # Get all entities
         for _ in xrange(ENTITY_LIST_SIZE):
             new_entity = Entity(entity_address)
             entity_list.append(new_entity)

@@ -2,7 +2,7 @@ from copy import deepcopy
 import logging
 import time
 
-from core.entity import get_entity_list
+from core.client import Client
 from core.movement_engine import MovementEngine
 from core.player import Player
 from core.script_manager import BaseScript
@@ -21,7 +21,8 @@ class Script(BaseScript):
     def run():
         logger.debug('going to say hi to err1')
         player = Player()
-        entity_list = get_entity_list()
+        client = Client()
+        entity_list = client.get_entity_list()
 
         original_coords = deepcopy(player.position)
         for entity in entity_list:

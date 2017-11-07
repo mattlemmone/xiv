@@ -12,6 +12,7 @@ from threading import Thread
 
 from core.pointers import multi_level_pointers
 from core.pointers import single_level_pointers
+from core.registry_entries import RegistryEntry
 from lib import application
 from lib.singleton import Singleton
 
@@ -42,19 +43,6 @@ GetLastError.restype = DWORD
 
 # Milliseconds
 DEFAULT_POLL_RATE = 100
-
-
-class RegistryEntry(object):
-    def __init__(
-        self, description,
-        reference, attribute_path, address, offset, data_type,
-    ):
-        assert address, 'Address must exist in order to create RegistryEntry'
-        self.description = description
-        self.reference = reference
-        self.attribute_path = attribute_path
-        self.data_type = data_type
-        self.address = address + offset
 
 
 class MemoryWatch(Thread):
@@ -118,6 +106,8 @@ def _resolve_multi_level_pointers():
             pointer.offsets,
         )
 
+        assert pointer.address, 'Error resolving multi lvl pointer %s!' % name
+
 
 def _resolve_single_level_pointers():
     """
@@ -128,7 +118,9 @@ def _resolve_single_level_pointers():
     for name, pointer in single_level_pointers.items():
         logger.debug("Resolving %s pointer @ %s...", name, pointer.offsets)
         assert len(pointer.offsets) == 1, 'Static pointers must have one offset'
+
         pointer.address = application.base_address + pointer.offsets[0]
+        assert pointer.address, 'Error resolving single lvl pointer %s!' % name
 
 
 def _reference_update(reference, attribute_path, new_value):
