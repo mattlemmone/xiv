@@ -6,6 +6,7 @@ from ctypes.wintypes import c_ulonglong
 from ctypes.wintypes import create_string_buffer
 from munch import Munch
 
+from core.offsets import client_offsets
 from core.offsets import entity_base_offsets
 from core.offsets import player_parameter_offsets
 from core.offsets import player_skill_offsets
@@ -36,7 +37,8 @@ class RegistryEntry(object):
 
 POINTERS = Munch(
     client=Munch(
-        last_cmd=single_level_pointers.last_cmd
+        last_cmd=single_level_pointers.last_cmd,
+        hacks=multi_level_pointers.entity_base,
     ),
     entity=Munch(
         base=None
@@ -50,6 +52,9 @@ POINTERS = Munch(
 )
 
 OFFSETS = Munch(
+    client=Munch(
+        hacks=client_offsets
+    ),
     entity=Munch(
         base=entity_base_offsets
     ),
@@ -61,7 +66,11 @@ OFFSETS = Munch(
 )
 
 client_entries = [
-    ('last_cmd', CMD_BUFFER)
+    ('last_cmd', CMD_BUFFER),
+    ('hacks player_speed', c_float()),
+    ('hacks jump_grav_start', c_float()),
+    ('hacks jump_dir_1', c_float()),
+    ('hacks jump_dir_2', c_float()),
 ]
 
 entity_entries = [
@@ -119,10 +128,16 @@ def build_registry_entry(
     pointer = POINTERS[category]
     offset = OFFSETS.get(category, 0)
 
-
     if category == 'client':
-        pointer = pointer[attr_type_tuple[0]]
+        pointer = pointer[attribute_path[0]]
         offset = 0
+
+        if len(attribute_path) == 2:
+            # Client hacks are based on player base addr
+            if attribute_path[0] == 'hacks':
+                offset = OFFSETS.client.hacks.get(attribute_path[1], 0)
+            if attribute_path[1] == 'player_speed':
+                pointer = single_level_pointers.player_speed
     else:
         # Entity or Player
         if category == 'entity':

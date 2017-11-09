@@ -92,7 +92,7 @@ def go_to_enemy(enemy):
     # Set target, face it, run to it
     player.set_target(enemy.address)
 
-    MovementEngine.run_to(enemy.position, tolerance=8)
+    MovementEngine.run_to(enemy.position, tolerance=20)
 
 
 def fight_enemy(enemy):

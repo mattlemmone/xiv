@@ -138,7 +138,8 @@ def _reference_update(reference, attribute_path, new_value):
             next_ref, cloned_path, new_value
         )
     else:
-        setattr(reference, attr, new_value)
+        if getattr(reference, attr) != new_value:
+            setattr(reference, attr, new_value)
 
 
 def read_address(address, data_buffer):

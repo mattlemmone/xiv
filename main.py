@@ -2,6 +2,7 @@ from threading import Thread
 import logging
 
 from lib.memory import MemoryWatch
+from core.client import Client
 from core.player import Player
 from lib import application
 from lib import process
@@ -21,6 +22,7 @@ def initialize_application_data():
 def create_registry_singletons():
     # Everything here will be registered to MemoryWatch
     Player()
+    Client()
 
 
 def main():

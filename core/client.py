@@ -6,6 +6,7 @@ import logging
 import time
 
 from core.entity import Entity
+from core.hacks import Hacks
 from core.offsets import entity_size
 from core.pointers import multi_level_pointers
 from core.pointers import single_level_pointers
@@ -37,6 +38,7 @@ class Client(Registerable):
         self.address = 'client'
         self.entity_address_list = []
         self._last_cmd = ''
+        self.hacks = Hacks()
 
         super(Client, self).__init__()
 

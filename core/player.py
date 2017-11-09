@@ -1,6 +1,6 @@
 import logging
-
 from ctypes.wintypes import c_ulonglong
+
 from core.entity import Entity
 from core.pointers import multi_level_pointers
 from core.pointers import single_level_pointers
